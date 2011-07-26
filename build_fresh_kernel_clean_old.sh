@@ -39,6 +39,22 @@ function clean_kernels {
 }
 
 function find_active_kernel {
+	kernels=`eselect kernel list | grep linux | cut -b15- | cut -f1 -d" "`
+	b=
+	for k in $kernels; do
+		b="$b $k $k "
+	done
+	dialog --menu "Select kernel to build" 0 0 0 $b 2> $tempfile
+	retval=$?
+	choise=`cat $tempfile`
+	case $retval in
+		0)
+			echo "$choise"
+			eselect kernel set linux-$choise;;
+		1) exit 1;;
+		255) exit 255;;
+		*) exit $retval;;
+	esac
 	active_kernel=`eselect kernel list | grep '*' | cut -b15- | cut -f1 -d" "`
 }
 
